@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lumina Dev — Portfolio</title>
+    <meta name="description" content="Developer portfolio" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script type="module">
+      import Chatbot from 'https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js'
+      Chatbot.init({
+        chatflowid: '9ba628e2-2c1f-48d2-b35d-0dc8440a58dd',
+        apiHost: 'https://abo7assan-furnivision-flowise.hf.space',
+        theme: {
+          button: {
+            backgroundColor: '#6366F1',
+            right: 20,
+            bottom: 20,
+            size: 52,
+            dragAndDrop: true,
+            iconColor: 'white',
+            customIconSrc: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'),
+            autoWindowOpen: {
+              autoOpen: false,
+              openDelay: 2,
+              autoOpenOnMobile: false
+            }
+          },
+          tooltip: {
+            showTooltip: true,
+            tooltipMessage: "Hi! I'm your assistant 👋",
+            tooltipBackgroundColor: '#171f33',
+            tooltipTextColor: '#dae2fd',
+            tooltipFontSize: 14
+          },
+          disclaimer: {
+            title: 'Portfolio Assistant',
+            message: 'Ask me about projects, skills, experience, or how to get in touch.',
+            textColor: '#dae2fd',
+            buttonColor: '#6366F1',
+            buttonText: 'Start Chatting',
+            buttonTextColor: '#ffffff',
+            blurredBackgroundColor: 'rgba(11, 19, 38, 0.8)',
+            backgroundColor: '#171f33'
+          },
+          customCSS: `
+            @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+            * { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+            button[part="button"] {
+              background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%) !important;
+              box-shadow: 0 10px 30px rgba(99, 102, 241, 0.35) !important;
+              border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            }
+            div[part="bot"] {
+              border: 1px solid rgba(255, 255, 255, 0.1) !important;
+              box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45) !important;
+              border-radius: 12px !important;
+              overflow: hidden !important;
+            }
+          `,
+          chatWindow: {
+            showTitle: true,
+            showAgentMessages: true,
+            title: "Portfolio Assistant",
+            titleAvatarSrc: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%236366F1"/><text x="32" y="42" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif" font-weight="700">A</text></svg>'),
+            welcomeMessage: "Hello! I'm here to help you learn about my work, skills, and projects. What would you like to know?",
+            errorMessage: 'Something went wrong. Please try again or use the contact section.',
+            backgroundColor: '#0b1326',
+            height: 620,
+            width: 400,
+            fontSize: 15,
+            starterPrompts: [
+              'What projects have you built?',
+              'What are your main skills?',
+              'How can I contact you?'
+            ],
+            starterPromptFontSize: 14,
+            clearChatOnReload: false,
+            renderHTML: true,
+            botMessage: {
+              backgroundColor: '#171f33',
+              textColor: '#dae2fd',
+              showAvatar: true,
+              avatarSrc: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%236366F1"/><text x="32" y="42" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif" font-weight="700">A</text></svg>')
+            },
+            userMessage: {
+              backgroundColor: '#6366F1',
+              textColor: '#ffffff',
+              showAvatar: true,
+              avatarSrc: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>')
+            },
+            textInput: {
+              placeholder: 'Ask about my portfolio...',
+              backgroundColor: '#131b2e',
+              textColor: '#dae2fd',
+              sendButtonColor: '#8083ff',
+              maxChars: 500,
+              maxCharsWarningMessage: 'Message is too long. Please keep it under 500 characters.',
+              autoFocus: true,
+              sendMessageSound: false,
+              receiveMessageSound: false
+            },
+            feedback: {
+              color: '#c7c4d7'
+            },
+            dateTimeToggle: {
+              date: true,
+              time: true
+            },
+            footer: {
+              textColor: '#908fa0',
+              text: 'Ask me anything about',
+              company: 'this portfolio',
+              companyLink: window.location.origin
+            }
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
