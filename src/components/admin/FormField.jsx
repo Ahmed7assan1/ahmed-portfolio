@@ -5,7 +5,7 @@ const baseInput =
   'w-full rounded bg-surface-container-low border border-white/10 px-3 py-2 text-on-surface focus:border-primary outline-none text-sm'
 
 export default function FormField({ field, value, onChange }) {
-  const { name, label, type, required, help, bucket } = field
+  const { name, label, type, required, help, bucket, imageGuide } = field
 
   const set = (v) => onChange(name, v)
 
@@ -101,7 +101,9 @@ export default function FormField({ field, value, onChange }) {
         />
       )}
 
-      {type === 'image' && <ImageUpload value={value} onChange={set} label={label} bucket={bucket} />}
+      {type === 'image' && (
+        <ImageUpload value={value} onChange={set} label={label} bucket={bucket} guide={imageGuide} />
+      )}
 
       {type === 'social-icon' && <SocialIconPicker value={value ?? ''} onChange={set} />}
 

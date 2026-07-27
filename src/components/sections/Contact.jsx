@@ -1,84 +1,85 @@
-import SectionHeading from '../ui/SectionHeading.jsx'
-import GlassCard from '../ui/GlassCard.jsx'
+import { motion } from 'motion/react'
 import { SocialIcon } from '../../lib/socialIcons.jsx'
 import { useSupabaseCRUD } from '../../hooks/useSupabaseCRUD.js'
-import { useStaggerReveal } from '../../hooks/useStaggerReveal.js'
+import { MotionReveal, MotionStagger, MotionItem } from '../ui/MotionReveal.jsx'
+import { fadeUp, scaleIn } from '../../lib/motion.js'
+import MagneticButton from '../ui/MagneticButton.jsx'
 
 export default function Contact({ profile }) {
   const { data: socialLinks } = useSupabaseCRUD('social_links')
-  const { ref, isVisible } = useStaggerReveal()
 
   return (
     <section id="contact" className="section-container section-padding">
-      <div
-        ref={ref}
-        className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}
-      >
-        <div>
-          <SectionHeading eyebrow="Let's Work Together" title="Have a project in mind?" />
-          <p className="text-body-md text-on-surface-variant max-w-md mb-8">
-            I'm always open to discussing new projects and opportunities. Let's create something
-            amazing together.
-          </p>
-          <a href={`mailto:${profile?.email || ''}`} className="btn-primary group">
-            Get In Touch
-            <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-          </a>
-        </div>
+      <MotionReveal variant={scaleIn}>
+        <div className="relative rounded-[2rem] overflow-hidden glass luxe-border px-6 sm:px-12 py-16 sm:py-20 text-center">
+          <div
+            className="absolute inset-0 -z-10 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 60% 60% at 50% 15%, rgba(56,189,248,0.14), transparent 70%)',
+            }}
+          />
+          <div
+            className="absolute inset-0 -z-10 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 50% 50% at 80% 90%, rgba(255,255,255,0.05), transparent 70%)',
+            }}
+          />
 
-        <GlassCard>
-          <ul className="space-y-4">
+          <span className="eyebrow mb-5 inline-block">Let's Work Together</span>
+          <h2 className="font-display text-on-surface text-[clamp(2.25rem,7vw,5rem)] font-semibold leading-[1.05] max-w-3xl mx-auto mb-8">
+            Have a project in mind? Let's build something extraordinary.
+          </h2>
+
+          <MagneticButton
+            href={`mailto:${profile?.email || ''}`}
+            className="btn-primary text-base px-8 py-4"
+            whileHover={{ scale: 1.04, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Get In Touch
+            <motion.span className="inline-block" whileHover={{ x: 4 }}>
+              →
+            </motion.span>
+          </MagneticButton>
+
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 font-mono text-xs uppercase tracking-widest text-on-surface-variant/70 border-t border-white/10 pt-6">
             {profile?.email && (
-              <li className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-on-surface-variant group">
-                <span className="text-primary font-mono text-sm sm:w-16 shrink-0">Email</span>
-                <a href={`mailto:${profile.email}`} className="hover:text-primary transition-colors truncate min-w-0">
-                  {profile.email}
-                </a>
-              </li>
+              <a href={`mailto:${profile.email}`} className="hover:text-primary transition-colors">
+                {profile.email}
+              </a>
             )}
             {profile?.phone && (
-              <li className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-on-surface-variant">
-                <span className="text-primary font-mono text-sm sm:w-16 shrink-0">Phone</span>
-                <a href={`tel:${profile.phone}`} className="hover:text-primary transition-colors">
-                  {profile.phone}
-                </a>
-              </li>
+              <a href={`tel:${profile.phone}`} className="hover:text-primary transition-colors">
+                {profile.phone}
+              </a>
             )}
-            {profile?.location && (
-              <li className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-on-surface-variant">
-                <span className="text-primary font-mono text-sm sm:w-16 shrink-0">Location</span>
-                <span>{profile.location}</span>
-              </li>
-            )}
-          </ul>
+            {profile?.location && <span>{profile.location}</span>}
+          </div>
 
           {socialLinks?.length > 0 && (
-            <div className="mt-6 pt-6 border-t border-white/10">
-              <p className="font-mono text-label-mono text-primary mb-4 uppercase tracking-widest">Connect</p>
-              <div className="flex flex-wrap gap-3">
-                {socialLinks.map((s) => (
-                  <a
-                    key={s.id}
+            <MotionStagger className="mt-8 flex flex-wrap justify-center gap-3" stagger={0.06}>
+              {socialLinks.map((s) => (
+                <MotionItem key={s.id} variant={fadeUp}>
+                  <motion.a
                     href={s.url}
                     target="_blank"
                     rel="noreferrer"
                     title={s.platform}
-                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-surface-container-high border border-white/10 hover:border-primary/40 hover:bg-primary/10 text-sm text-on-surface-variant hover:text-primary transition-all duration-300 hover:scale-105 hover:shadow-glow group"
+                    className="w-11 h-11 flex items-center justify-center rounded-full bg-white/[0.04] border border-white/10 hover:border-primary/50 hover:bg-primary/10 transition-colors group"
+                    whileHover={{ scale: 1.1, y: -3 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <SocialIcon
                       platform={s.icon || s.platform}
-                      className="w-4 h-4 fill-on-surface-variant group-hover:fill-primary transition-colors"
+                      className="w-[18px] h-[18px] fill-on-surface-variant group-hover:fill-primary transition-colors duration-300"
                     />
-                    <span>{s.platform}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
+                  </motion.a>
+                </MotionItem>
+              ))}
+            </MotionStagger>
           )}
-        </GlassCard>
-      </div>
+        </div>
+      </MotionReveal>
     </section>
   )
 }

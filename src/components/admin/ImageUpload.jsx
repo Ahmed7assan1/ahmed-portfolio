@@ -1,18 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient.js'
 
 const FALLBACK_BUCKET =
   import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || 'portfolio-assets'
 
-export default function ImageUpload({ value, onChange, label, bucket }) {
+export default function ImageUpload({ value, onChange, label, bucket, guide }) {
   const BUCKET = bucket || FALLBACK_BUCKET
 
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const [localPreview, setLocalPreview] = useState(null)
+  const objectUrlRef = useRef(null)
+
+  // Revoke any local blob preview on unmount so we don't leak memory.
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current)
+    }
+  }, [])
 
   const handleFile = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    // Show the picked file immediately — the live preview shouldn't wait on the network round trip.
+    if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current)
+    const blobUrl = URL.createObjectURL(file)
+    objectUrlRef.current = blobUrl
+    setLocalPreview(blobUrl)
 
     setUploading(true)
     setError('')
@@ -64,6 +79,8 @@ export default function ImageUpload({ value, onChange, label, bucket }) {
     }
   }
 
+  const previewSrc = localPreview || value
+
   return (
     <div className="space-y-2">
       <input
@@ -79,13 +96,14 @@ export default function ImageUpload({ value, onChange, label, bucket }) {
           {uploading ? 'Uploading…' : `Upload ${label || 'file'}`}
           <input
             type="file"
+            accept="image/*"
             className="hidden"
             onChange={handleFile}
             disabled={uploading}
           />
         </label>
 
-        {value && (
+        {value && !guide && (
           <a
             href={value}
             target="_blank"
@@ -101,6 +119,49 @@ export default function ImageUpload({ value, onChange, label, bucket }) {
         <p className="text-xs text-error">
           {error}
         </p>
+      )}
+
+      {guide && (
+        <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 flex flex-col sm:flex-row gap-4">
+          <div className="flex-1 min-w-0 space-y-1.5 text-xs text-on-surface-variant">
+            <p>
+              <span className="text-on-surface font-medium">Recommended size:</span>{' '}
+              {guide.recommendedSize}
+            </p>
+            <p>
+              <span className="text-on-surface font-medium">Aspect ratio:</span>{' '}
+              {guide.aspectRatioLabel}
+            </p>
+            {guide.notes && <p className="text-on-surface-variant/70 leading-relaxed">{guide.notes}</p>}
+          </div>
+
+          {previewSrc && (
+            <div className="shrink-0">
+              <p className="text-[10px] uppercase tracking-wide text-on-surface-variant/60 mb-1.5">
+                Live preview — how this crops on the site
+              </p>
+              <div
+                className="relative overflow-hidden rounded-md border border-white/10 bg-black/30 mx-auto"
+                style={{ aspectRatio: guide.aspectRatio, width: guide.previewWidth || 150 }}
+              >
+                <img
+                  src={previewSrc}
+                  alt="Crop preview"
+                  className={`w-full h-full object-cover ${guide.objectPosition || 'object-top'}`}
+                />
+                <div className="pointer-events-none absolute inset-[6%] border border-dashed border-white/35 rounded-sm" />
+              </div>
+              <a
+                href={previewSrc}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1.5 block text-center text-[10px] text-primary hover:underline"
+              >
+                Open full image →
+              </a>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )

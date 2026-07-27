@@ -16,7 +16,22 @@ export const tableConfigs = {
       { name: 'full_name', label: 'Full name', type: 'text', required: true },
       { name: 'job_title', label: 'Job title', type: 'text' },
       { name: 'bio', label: 'Bio', type: 'textarea' },
-      { name: 'avatar_url', label: 'Avatar image', type: 'image', bucket: 'avatars' },
+      {
+        name: 'avatar_url',
+        label: 'Avatar image',
+        type: 'image',
+        bucket: 'avatars',
+        help: 'Shown full-height in the Hero. Use a vertical photo framed from mid-chest up — a tight face-only close-up will look cropped.',
+        imageGuide: {
+          recommendedSize: '1600 × 2000px (or larger, same ratio)',
+          aspectRatio: '4 / 5',
+          aspectRatioLabel: '4:5 portrait',
+          objectPosition: 'object-top',
+          previewWidth: 150,
+          notes:
+            'The Hero crops from the top down, so keep your head near the top third with room below for shoulders/torso. The dashed box shows the safe area — keep your face and torso inside it.',
+        },
+      },
       { name: 'cv_url', label: 'CV / resume file', type: 'image', bucket: 'cv' },
       { name: 'email', label: 'Email', type: 'text' },
       { name: 'phone', label: 'Phone', type: 'text' },

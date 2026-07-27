@@ -9,15 +9,11 @@ html {
 body {
   @apply bg-background text-on-background font-body;
   overflow-x: hidden;
-  background-image:
-    radial-gradient(ellipse 800px 600px at 15% 0%, rgba(128, 131, 255, 0.16), transparent 60%),
-    radial-gradient(ellipse 700px 600px at 90% 20%, rgba(111, 0, 190, 0.14), transparent 60%),
-    radial-gradient(ellipse 900px 700px at 50% 100%, rgba(77, 142, 255, 0.10), transparent 60%);
-  background-attachment: fixed;
 }
 
 ::selection {
-  background: rgba(192, 193, 255, 0.3);
+  background: rgba(56, 189, 248, 0.3);
+  color: #f2f1ec;
 }
 
 /* Focus visibility for keyboard users */
@@ -26,14 +22,31 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid #c0c1ff;
+  outline: 2px solid #38bdf8;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+}
+
+.section-divider {
+  position: relative;
+}
+
+.section-divider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92%, 780px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  pointer-events: none;
 }
 
 @keyframes fade-in {
@@ -41,54 +54,56 @@ select:focus-visible {
   to   { opacity: 1; }
 }
 
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
 @keyframes modal-in {
   from { opacity: 0; transform: translateY(24px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.25s ease-out both;
 }
 
 .animate-modal-in {
   animation: modal-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes fade-in-down {
-  from { opacity: 0; transform: translateY(-12px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25%      { transform: translateY(-20px) rotate(2deg); }
-  75%      { transform: translateY(10px) rotate(-1deg); }
+.animate-marquee {
+  animation: marquee-scroll 32s linear infinite;
 }
 
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50%      { opacity: 0.5; transform: scale(1.05); }
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 0.7s ease-out both;
+@keyframes border-spin {
+  to { --border-angle: 360deg; }
 }
 
-.animate-fade-in-down {
-  animation: fade-in-down 0.4s ease-out both;
+.portrait-ring {
+  background: conic-gradient(
+    from var(--border-angle),
+    rgba(56, 189, 248, 0.85),
+    rgba(255, 255, 255, 0.12) 35%,
+    rgba(255, 255, 255, 0.04) 60%,
+    rgba(56, 189, 248, 0.85)
+  );
+  animation: border-spin 11s linear infinite;
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(18px, -26px, 0); }
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 4s ease-in-out infinite;
+.animate-drift {
+  animation: drift 14s ease-in-out infinite;
 }
 
 .line-clamp-3 {
@@ -111,30 +126,81 @@ select:focus-visible {
 
 @layer components {
   .glass {
-    @apply bg-surface-container/50 backdrop-blur-glass border border-white/10;
+    @apply bg-surface-container/50 backdrop-blur-glass border border-white/[0.08];
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 20px 50px rgba(0, 0, 0, 0.4);
   }
 
   .glass-hover {
-    @apply transition-all duration-300 hover:border-primary/40 hover:shadow-glow;
+    @apply transition-all duration-500;
+  }
+
+  .glass-hover:hover {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 24px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .luxe-border {
+    position: relative;
+  }
+
+  .luxe-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.16),
+      rgba(255, 255, 255, 0.02) 45%,
+      rgba(56, 189, 248, 0.3) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
+  }
+
+  .luxe-border:hover::before {
+    opacity: 1;
+  }
+
+  .luxe-spotlight-layer {
+    background: radial-gradient(
+      480px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+      rgba(255, 255, 255, 0.06),
+      transparent 60%
+    );
   }
 
   .section-container {
-    @apply max-w-container mx-auto px-4 sm:px-6 md:px-8;
+    @apply max-w-container mx-auto px-5 sm:px-8 md:px-10;
   }
 
   .section-padding {
-    @apply py-10 sm:py-16 md:py-24;
+    @apply py-12 sm:py-16 md:py-20;
   }
 
   .eyebrow {
-    @apply font-mono text-label-mono uppercase tracking-widest text-primary;
+    @apply font-mono text-label-mono uppercase tracking-[0.22em] text-primary;
   }
 
   .btn-primary {
-    @apply inline-flex items-center gap-2 rounded bg-gradient-to-r from-[#6366F1] to-[#A855F7] text-white font-semibold px-6 py-3 transition-all duration-300 hover:shadow-glow hover:-translate-y-0.5;
+    @apply inline-flex items-center gap-2 rounded-full bg-primary text-[#062033] font-display font-semibold px-7 py-3.5 transition-all duration-300;
+    box-shadow: 0 10px 30px rgba(56, 189, 248, 0.22);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 14px 42px rgba(56, 189, 248, 0.35);
+    filter: brightness(1.08);
   }
 
   .btn-outline {
-    @apply inline-flex items-center gap-2 rounded border border-primary/60 text-on-surface font-semibold px-6 py-3 transition-all duration-300 hover:bg-primary/10;
+    @apply inline-flex items-center gap-2 rounded-full border border-white/15 text-on-surface font-display font-semibold px-7 py-3.5 transition-all duration-300 hover:border-primary/60 hover:bg-white/[0.04];
   }
 }
