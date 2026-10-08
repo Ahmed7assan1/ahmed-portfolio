@@ -1,133 +1,153 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion, useInView } from 'motion/react'
+import { useState } from 'react'
+import { motion } from 'motion/react'
 import SectionHeading from '../ui/SectionHeading.jsx'
-import { Loader, ErrorState, EmptyState } from '../ui/Loader.jsx'
-import { useSupabaseCRUD } from '../../hooks/useSupabaseCRUD.js'
-import { MotionReveal, MotionStagger, MotionItem } from '../ui/MotionReveal.jsx'
-import { fadeUp } from '../../lib/motion.js'
+import { skillCategories } from '../../data/skills.ts'
+import {
+  Code2,
+  Cpu,
+  Database,
+  Palette,
+  CheckCircle2,
+  Wrench,
+  Search,
+  Sparkles,
+} from 'lucide-react'
 
-function Counter({ value, suffix = '' }) {
-  const [display, setDisplay] = useState(0)
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, amount: 0.6 })
-
-  useEffect(() => {
-    if (!inView) return
-    const target = Number(value) || 0
-    if (display < target) {
-      const step = Math.ceil(target / 24)
-      const timer = setTimeout(() => setDisplay(Math.min(display + step, target)), 32)
-      return () => clearTimeout(timer)
-    }
-  }, [display, value, inView])
-
-  return (
-    <span ref={ref} className="tabular-nums">
-      {display}
-      {suffix}
-    </span>
-  )
-}
-
-function SkillPill({ name, level = 0 }) {
-  return (
-    <motion.div
-      className="relative overflow-hidden px-4 py-2 rounded-full border border-white/10 bg-white/[0.02]"
-      whileHover={{ y: -2, borderColor: 'rgba(56,189,248,0.4)' }}
-      transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-    >
-      <span className="relative z-10 text-sm text-on-surface font-medium whitespace-nowrap">{name}</span>
-      <motion.span
-        className="absolute inset-x-0 bottom-0 h-[2px] bg-primary/60 origin-left"
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: level / 100 }}
-        viewport={{ once: true, amount: 0.8 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-      />
-    </motion.div>
-  )
+const CATEGORY_ICONS = {
+  frontend: Code2,
+  'ai-automation': Cpu,
+  'backend-apis': Database,
+  'ui-ux': Palette,
+  'testing-quality': CheckCircle2,
+  'tools-algorithms': Wrench,
 }
 
 export default function Skills() {
-  const { data: skills, loading, error } = useSupabaseCRUD('skills')
+  const [activeFilter, setActiveFilter] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const groups = skills.reduce((acc, skill) => {
-    const cat = skill.category || 'Skills'
-    acc[cat] = acc[cat] || []
-    acc[cat].push(skill)
-    return acc
-  }, {})
+  const filteredCategories = skillCategories
+    .filter((cat) => activeFilter === 'all' || cat.id === activeFilter)
+    .map((cat) => ({
+      ...cat,
+      skills: cat.skills.filter((skill) =>
+        skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        skill.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    }))
+    .filter((cat) => cat.skills.length > 0)
 
-  const categoryCount = Object.keys(groups).length
-  const avgLevel = skills.length
-    ? Math.round(skills.reduce((sum, s) => sum + (s.level ?? 0), 0) / skills.length)
-    : 0
+  const totalSkillsCount = skillCategories.reduce((acc, cat) => acc + cat.skills.length, 0)
 
   return (
     <section id="skills" className="section-container section-padding section-divider">
-      {loading && <Loader label="Loading skills" />}
-      {error && <ErrorState message={error} />}
-      {!loading && !error && skills.length === 0 && (
-        <EmptyState message="No skills added yet. Add some from the admin dashboard." />
-      )}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <SectionHeading
+          index="02"
+          eyebrow="Technical Proficiency"
+          title="Verified tools, frameworks & engineering disciplines"
+        />
 
-      {!loading && !error && skills.length > 0 && (
-        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-start">
-          <div>
-            <MotionReveal variant={fadeUp}>
-              <SectionHeading index="02" eyebrow="My Skills" title="Technologies I work with" />
-              <p className="text-body-md text-on-surface-variant leading-relaxed max-w-sm">
-                A working toolkit spanning {categoryCount} discipline{categoryCount === 1 ? '' : 's'}, refined on
-                real production work rather than tutorials.
-              </p>
+        {/* Search input for quick lookup */}
+        <div className="relative w-full md:w-72">
+          <Search className="w-4 h-4 text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search technologies..."
+            className="w-full bg-surface-container/70 border border-white/10 rounded-full pl-10 pr-4 py-2 text-xs text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary/50 focus:outline-none transition-colors"
+          />
+        </div>
+      </div>
 
-              <div className="flex items-center gap-6 mt-8 pt-6 border-t border-white/10 max-w-sm">
-                <div>
-                  <p className="font-display text-2xl text-on-surface font-semibold">
-                    <Counter value={skills.length} />
-                  </p>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant/60">
-                    Tools
-                  </p>
-                </div>
-                <div className="w-px h-8 bg-white/10" />
-                <div>
-                  <p className="font-display text-2xl text-on-surface font-semibold">
-                    <Counter value={categoryCount} />
-                  </p>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant/60">
-                    Disciplines
-                  </p>
-                </div>
-                <div className="w-px h-8 bg-white/10" />
-                <div>
-                  <p className="font-display text-2xl text-on-surface font-semibold">
-                    <Counter value={avgLevel} suffix="%" />
-                  </p>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant/60">
-                    Avg. level
-                  </p>
-                </div>
-              </div>
-            </MotionReveal>
-          </div>
+      {/* Category Filter Pills */}
+      <div className="flex flex-wrap items-center gap-2 mb-10 pb-2 overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => setActiveFilter('all')}
+          className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all ${
+            activeFilter === 'all'
+              ? 'bg-primary text-[#062033] font-semibold shadow-sm'
+              : 'bg-surface-container text-on-surface-variant hover:text-on-surface border border-white/5'
+          }`}
+        >
+          All Categories ({totalSkillsCount})
+        </button>
+        {skillCategories.map((cat) => (
+          <button
+            key={cat.id}
+            type="button"
+            onClick={() => setActiveFilter(cat.id)}
+            className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all ${
+              activeFilter === cat.id
+                ? 'bg-primary text-[#062033] font-semibold shadow-sm'
+                : 'bg-surface-container text-on-surface-variant hover:text-on-surface border border-white/5'
+            }`}
+          >
+            {cat.title}
+          </button>
+        ))}
+      </div>
 
-          <div className="space-y-8">
-            {Object.entries(groups).map(([category, items]) => (
-              <div key={category}>
-                <p className="font-mono text-label-mono uppercase tracking-widest text-on-surface-variant/50 mb-3">
-                  {category}
+      {/* Grid of Skill Categories */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredCategories.map((category) => {
+          const Icon = CATEGORY_ICONS[category.id] || Wrench
+          return (
+            <motion.div
+              key={category.id}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="glass-card p-6 flex flex-col justify-between space-y-5 bg-surface-container/50 border border-white/5 hover:border-primary/30"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-display font-semibold text-base text-on-surface">
+                      {category.title}
+                    </h3>
+                  </div>
+                  <span className="font-mono text-[11px] text-on-surface-variant/80 bg-white/[0.04] px-2 py-0.5 rounded">
+                    {category.skills.length}
+                  </span>
+                </div>
+
+                <p className="text-xs text-on-surface-variant leading-relaxed">
+                  {category.description}
                 </p>
-                <MotionStagger className="flex flex-wrap gap-2.5" stagger={0.05}>
-                  {items.map((skill) => (
-                    <MotionItem key={skill.id} variant={fadeUp}>
-                      <SkillPill name={skill.name} level={skill.level ?? 0} />
-                    </MotionItem>
-                  ))}
-                </MotionStagger>
               </div>
-            ))}
-          </div>
+
+              {/* Badges List (NO fake percentages) */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                {category.skills.map((skill) => (
+                  <div
+                    key={skill.name}
+                    title={skill.description}
+                    className={`group relative px-3 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 cursor-default ${
+                      skill.highlight
+                        ? 'bg-primary/10 text-primary border border-primary/25 hover:bg-primary/20 hover:border-primary/40'
+                        : 'bg-surface-container-high/60 text-on-surface border border-white/5 hover:border-white/15'
+                    }`}
+                  >
+                    {skill.highlight && <Sparkles className="w-3 h-3 text-primary/80" />}
+                    <span>{skill.name}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {filteredCategories.length === 0 && (
+        <div className="py-16 text-center text-sm font-mono text-on-surface-variant">
+          No skills match "{searchQuery}"
         </div>
       )}
     </section>

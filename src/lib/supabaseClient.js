@@ -3,11 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseKey) {
-  // eslint-disable-next-line no-console
-  console.warn(
-    'Missing Supabase env vars. Copy .env.example to .env and fill in VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY.'
-  )
-}
+export const isSupabaseConfigured = Boolean(
+  supabaseUrl &&
+    supabaseKey &&
+    supabaseUrl !== 'https://YOUR-PROJECT-REF.supabase.co' &&
+    !supabaseUrl.includes('YOUR-PROJECT-REF')
+)
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+export const supabase = isSupabaseConfigured
+  ? createClient(supabaseUrl, supabaseKey)
+  : null

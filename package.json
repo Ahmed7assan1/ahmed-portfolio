@@ -12,17 +12,21 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
     "flowise-embed": "^3.1.6",
+    "lucide-react": "^1.53.0",
     "motion": "^12.42.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "playwright": "^1.62.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
+    "typescript": "^7.0.2",
     "vite": "^5.4.8"
   }
 }

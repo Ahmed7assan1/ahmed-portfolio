@@ -6,6 +6,21 @@
  * Column names match the actual database schema exactly.
  */
 export const tableConfigs = {
+  contact_messages: {
+    label: 'Contact Inquiries',
+    table: 'contact_messages',
+    orderBy: 'created_at',
+    ascending: false,
+    titleField: 'name',
+    fields: [
+      { name: 'name', label: 'Sender Name', type: 'text', required: true },
+      { name: 'email', label: 'Sender Email', type: 'text', required: true },
+      { name: 'message', label: 'Message Body', type: 'textarea', required: true },
+      { name: 'read', label: 'Mark as Read', type: 'boolean' },
+      { name: 'created_at', label: 'Timestamp', type: 'text' },
+    ],
+  },
+
   profile: {
     label: 'Profile',
     table: 'profile',

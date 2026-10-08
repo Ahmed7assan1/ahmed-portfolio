@@ -1,18 +1,105 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portfolio</title>
-    <meta name="description" content="Developer portfolio" />
+    
+    <!-- Primary Meta Tags -->
+    <title>Ahmed Hassan | Software Engineer & Front-End Developer</title>
+    <meta name="title" content="Ahmed Hassan | Software Engineer & Front-End Developer" />
+    <meta
+      name="description"
+      content="Portfolio of Ahmed Hassan, Software Engineer and Front-End Developer specializing in React, TypeScript, Angular, and AI integration & workflow automation. ECPC Rank #55."
+    />
+    <meta name="author" content="Ahmed Hassan Mohamed Hassan El-Naggar" />
+    <meta name="keywords" content="Ahmed Hassan, Software Engineer, Front-End Developer, React, TypeScript, Angular, Vue.js, Flowise, AI Integration, ECPC, Portfolio" />
+    <meta name="theme-color" content="#0a0a0a" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ahmedhassan.dev/" />
+    <meta property="og:title" content="Ahmed Hassan | Software Engineer & Front-End Developer" />
+    <meta
+      property="og:description"
+      content="Specialized in building high-performance, accessible web systems with React, TypeScript, Angular, and AI integrations. Flagship project: FurniVision."
+    />
+    <meta property="og:image" content="/images/projects/furnivision-transformation.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://ahmedhassan.dev/" />
+    <meta property="twitter:title" content="Ahmed Hassan | Software Engineer & Front-End Developer" />
+    <meta
+      property="twitter:description"
+      content="Software Engineer & Front-End Developer | React • TypeScript • Angular • AI Integration & Automation"
+    />
+    <meta property="twitter:image" content="/images/projects/furnivision-transformation.png" />
+
+    <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
+
+    <!-- Single Page Apps for GitHub Pages -->
+    <script type="text/javascript">
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Ahmed Hassan",
+        "alternateName": "Ahmed Hassan Mohamed Hassan El-Naggar",
+        "jobTitle": "Software Engineer & Front-End Developer",
+        "url": "https://ahmedhassan.dev",
+        "email": "ahmedhassan1907ua@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Cairo",
+          "addressCountry": "Egypt"
+        },
+        "alumniOf": {
+          "@type": "EducationalOrganization",
+          "name": "Shorouk Academy"
+        },
+        "knowsAbout": [
+          "React.js",
+          "TypeScript",
+          "Angular",
+          "Vue.js",
+          "Flowise",
+          "n8n",
+          "AI Workflow Automation",
+          "WebRTC",
+          "UI/UX Design",
+          "Algorithms & Data Structures"
+        ],
+        "sameAs": [
+          "https://github.com/Ahmed7assan1",
+          "https://linkedin.com/in/Ahmed_Hassan",
+          "https://codeforces.com/profile/Abo_7assan",
+          "https://behance.net/ahmedhassan498"
+        ]
+      }
+    </script>
   </head>
-  <body>
+  <body class="bg-background text-on-background selection:bg-primary/20 selection:text-primary">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script type="module">
@@ -37,14 +124,14 @@
           },
           tooltip: {
             showTooltip: true,
-            tooltipMessage: "Hi! I'm your assistant 👋",
+            tooltipMessage: "Ask Ahmed's AI Assistant 👋",
             tooltipBackgroundColor: '#161615',
             tooltipTextColor: '#f2f1ec',
-            tooltipFontSize: 14
+            tooltipFontSize: 13
           },
           disclaimer: {
-            title: 'Portfolio Assistant',
-            message: 'Ask me about projects, skills, experience, or how to get in touch.',
+            title: 'Ahmed Hassan Portfolio Assistant',
+            message: 'Ask me about Ahmed\'s projects (FurniVision, Mohameek), skills, experience, or contact information.',
             textColor: '#f2f1ec',
             buttonColor: '#38BDF8',
             buttonText: 'Start Chatting',
@@ -70,20 +157,20 @@
           chatWindow: {
             showTitle: true,
             showAgentMessages: true,
-            title: "Portfolio Assistant",
+            title: "Ahmed's AI Assistant",
             titleAvatarSrc: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%2338BDF8"/><text x="32" y="42" text-anchor="middle" fill="%23062033" font-size="28" font-family="sans-serif" font-weight="700">A</text></svg>'),
-            welcomeMessage: "Hello! I'm here to help you learn about my work, skills, and projects. What would you like to know?",
-            errorMessage: 'Something went wrong. Please try again or use the contact section.',
+            welcomeMessage: "Hello! I'm Ahmed's portfolio assistant. You can ask me about his flagship project FurniVision, front-end stack (React, TypeScript, Angular), AI workflows, or contact details.",
+            errorMessage: 'Something went wrong. Please try again or use the contact form.',
             backgroundColor: '#0a0a0a',
-            height: 620,
-            width: 400,
-            fontSize: 15,
+            height: 600,
+            width: 380,
+            fontSize: 14,
             starterPrompts: [
-              'What projects have you built?',
-              'What are your main skills?',
-              'How can I contact you?'
+              'Tell me about FurniVision',
+              'What are your main technologies?',
+              'How can I get in touch?'
             ],
-            starterPromptFontSize: 14,
+            starterPromptFontSize: 13,
             clearChatOnReload: false,
             renderHTML: true,
             botMessage: {
@@ -99,7 +186,7 @@
               avatarSrc: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>')
             },
             textInput: {
-              placeholder: 'Ask about my portfolio...',
+              placeholder: 'Ask about Ahmed\'s work...',
               backgroundColor: '#111110',
               textColor: '#f2f1ec',
               sendButtonColor: '#38BDF8',
@@ -118,8 +205,8 @@
             },
             footer: {
               textColor: '#5a5a55',
-              text: 'Ask me anything about',
-              company: 'this portfolio',
+              text: 'Powered by Flowise & LangChain •',
+              company: 'Ahmed Hassan Portfolio',
               companyLink: window.location.origin
             }
           }

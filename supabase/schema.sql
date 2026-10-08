@@ -1,8 +1,19 @@
 -- =========================================================
--- Lumina Dev Portfolio — Supabase schema
+-- Ahmed Hassan Portfolio — Supabase schema
 -- Run this in Supabase Dashboard → SQL Editor.
--- Column names match the existing database tables exactly.
 -- =========================================================
+
+-- ---------------------------------------------------------
+-- contact_messages (Primary dynamic feature)
+-- ---------------------------------------------------------
+create table if not exists contact_messages (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  email text not null,
+  message text not null,
+  read boolean default false,
+  created_at timestamptz default now()
+);
 
 -- ---------------------------------------------------------
 -- profile (single row: the portfolio owner)
@@ -106,11 +117,8 @@ create table if not exists certificates (
 
 -- =========================================================
 -- Row Level Security
--- Public (anon) can READ everything → needed for the portfolio
--- to display. Only authenticated users (you, the admin) can
--- write. Create your admin login in Authentication → Users.
 -- =========================================================
-
+alter table contact_messages enable row level security;
 alter table profile enable row level security;
 alter table social_links enable row level security;
 alter table skills enable row level security;
@@ -119,6 +127,15 @@ alter table experience enable row level security;
 alter table education enable row level security;
 alter table certificates enable row level security;
 
+-- Public can submit messages (anon insert only)
+create policy "public insert contact_messages" on contact_messages
+  for insert to anon with check (true);
+
+-- Authenticated (admin) can read, update, delete contact messages
+create policy "auth manage contact_messages" on contact_messages
+  for all to authenticated using (true) with check (true);
+
+-- Public read for static content tables
 do $$
 declare
   t text;
@@ -129,37 +146,5 @@ begin
     execute format('create policy "auth write %1$s insert" on %1$s for insert to authenticated with check (true);', t);
     execute format('create policy "auth write %1$s update" on %1$s for update to authenticated using (true) with check (true);', t);
     execute format('create policy "auth write %1$s delete" on %1$s for delete to authenticated using (true);', t);
-  end loop;
-end $$;
-
--- =========================================================
--- Storage buckets for files uploaded from the admin dashboard
--- =========================================================
-insert into storage.buckets (id, name, public)
-values
-  ('avatars', 'avatars', true),
-  ('certificates', 'certificates', true),
-  ('cv', 'cv', true),
-  ('projects', 'projects', true)
-on conflict (id) do update set public = excluded.public;
-
-do $$
-declare
-  b text;
-begin
-  foreach b in array array['avatars','certificates','cv','projects']
-  loop
-    if not exists (select 1 from pg_policies where policyname = format('public read %s', b) and tablename = 'objects' and schemaname = 'storage') then
-      execute format('create policy "public read %1$s" on storage.objects for select using (bucket_id = ''%1$s'');', b);
-    end if;
-    if not exists (select 1 from pg_policies where policyname = format('auth upload %s', b) and tablename = 'objects' and schemaname = 'storage') then
-      execute format('create policy "auth upload %1$s" on storage.objects for insert to authenticated with check (bucket_id = ''%1$s'');', b);
-    end if;
-    if not exists (select 1 from pg_policies where policyname = format('auth update %s', b) and tablename = 'objects' and schemaname = 'storage') then
-      execute format('create policy "auth update %1$s" on storage.objects for update to authenticated using (bucket_id = ''%1$s'');', b);
-    end if;
-    if not exists (select 1 from pg_policies where policyname = format('auth delete %s', b) and tablename = 'objects' and schemaname = 'storage') then
-      execute format('create policy "auth delete %1$s" on storage.objects for delete to authenticated using (bucket_id = ''%1$s'');', b);
-    end if;
   end loop;
 end $$;

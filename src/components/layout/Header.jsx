@@ -1,45 +1,31 @@
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
-import { easeOut } from '../../lib/motion.js'
-import MagneticButton from '../ui/MagneticButton.jsx'
+import { motion, AnimatePresence } from 'motion/react'
+import { useTheme } from '../../context/ThemeContext.jsx'
+import {
+  Sun,
+  Moon,
+  Menu,
+  X,
+  FileDown,
+  Terminal,
+} from 'lucide-react'
+import { GithubIcon, LinkedinIcon } from '../ui/Icons.jsx'
 
-const LINKS = [
+const NAV_LINKS = [
   { href: '#about', label: 'About' },
   { href: '#skills', label: 'Skills' },
-  { href: '#projects', label: 'Work' },
+  { href: '#projects', label: 'Projects' },
   { href: '#experience', label: 'Experience' },
-  { href: '#certificates', label: 'Certificates' },
+  { href: '#education', label: 'Education' },
+  { href: '#certifications', label: 'Certifications' },
   { href: '#contact', label: 'Contact' },
 ]
 
-function NavLink({ href, label, active, onClick }) {
-  const isActive = active === href
-
-  return (
-    <a
-      href={href}
-      onClick={onClick}
-      className={`relative px-3.5 py-1.5 text-xs uppercase tracking-[0.14em] font-medium rounded-full transition-colors duration-300 ${
-        isActive ? 'text-[#062033]' : 'text-on-surface-variant hover:text-on-surface'
-      }`}
-    >
-      {isActive && (
-        <motion.span
-          layoutId="nav-pill"
-          className="absolute inset-0 rounded-full bg-primary -z-10"
-          transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-        />
-      )}
-      {label}
-    </a>
-  )
-}
-
-export default function Header({ fullName }) {
+export default function Header({ onOpenCommandPalette }) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('')
-  const reduceMotion = useReducedMotion()
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -48,34 +34,24 @@ export default function Header({ fullName }) {
   }, [])
 
   useEffect(() => {
-    const visible = new Map()
-    const pick = () => {
-      let best = null
-      let bestTop = Infinity
-      for (const [id, ok] of visible) {
-        if (!ok) continue
-        const el = document.getElementById(id)
-        if (!el) continue
-        const top = el.getBoundingClientRect().top
-        if (top < bestTop) {
-          bestTop = top
-          best = id
+    const handleObserver = () => {
+      const sections = NAV_LINKS.map((link) => link.href.substring(1))
+      let current = ''
+      for (const sectionId of sections) {
+        const el = document.getElementById(sectionId)
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          if (rect.top <= 140 && rect.bottom >= 140) {
+            current = `#${sectionId}`
+            break
+          }
         }
       }
-      if (best) setActive(`#${best}`)
+      if (current) setActive(current)
     }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) visible.set(e.target.id, e.isIntersecting)
-        pick()
-      },
-      { rootMargin: '-90px 0px -70% 0px', threshold: 0 }
-    )
-    LINKS.forEach((l) => {
-      const el = document.querySelector(l.href)
-      if (el) observer.observe(el)
-    })
-    return () => observer.disconnect()
+
+    window.addEventListener('scroll', handleObserver, { passive: true })
+    return () => window.removeEventListener('scroll', handleObserver)
   }, [])
 
   useEffect(() => {
@@ -85,106 +61,205 @@ export default function Header({ fullName }) {
     }
   }, [open])
 
+  const handleLinkClick = (href) => {
+    setActive(href)
+    setOpen(false)
+  }
+
   return (
-    <motion.header
-      initial={reduceMotion ? false : { y: -40, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.7, ease: easeOut, delay: 0.1 }}
-      className="fixed top-4 sm:top-6 inset-x-0 z-50 flex flex-col items-center px-4"
-    >
-      <div
-        className={`w-full max-w-5xl flex items-center justify-between gap-4 rounded-full pl-4 pr-2 sm:pr-2.5 py-2 transition-all duration-500 ${
-          scrolled
-            ? 'bg-surface-container/70 backdrop-blur-glass border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.45)]'
-            : 'bg-white/[0.03] border border-white/[0.07] backdrop-blur-md'
-        }`}
-      >
-        <a href="#top" className="font-display font-semibold text-sm sm:text-base text-on-surface flex items-center gap-2.5 shrink-0">
-          <motion.span
-            className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary"
-            animate={{ opacity: [1, 0.4, 1] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <span className="hidden sm:inline">{fullName || 'Portfolio'}</span>
-        </a>
-
-        <nav className="hidden lg:flex items-center gap-1">
-          {LINKS.map((link) => (
-            <NavLink key={link.href} href={link.href} label={link.label} active={active} />
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <MagneticButton
-            href="#contact"
-            strength={0.2}
-            className="hidden md:inline-flex items-center rounded-full bg-primary text-[#062033] text-xs font-display font-semibold uppercase tracking-wider px-5 py-2.5"
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
+    <>
+      <header className="fixed top-3 sm:top-5 inset-x-0 z-50 flex justify-center px-4">
+        <nav
+          aria-label="Main Navigation"
+          className={`w-full max-w-6xl flex items-center justify-between gap-3 rounded-full pl-5 pr-3 py-2 transition-all duration-300 ${
+            scrolled
+              ? 'glass shadow-lg border-white/10 dark:border-white/10'
+              : 'bg-surface/80 backdrop-blur-md border border-white/10 dark:border-white/10'
+          }`}
+        >
+          {/* Logo / Brand */}
+          <a
+            href="#top"
+            className="flex items-center gap-2.5 font-display font-bold text-base tracking-tight text-on-surface hover:text-primary transition-colors group"
           >
-            Hire Me
-          </MagneticButton>
+            <span className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center font-mono text-xs font-semibold text-primary group-hover:scale-105 transition-transform">
+              AH
+            </span>
+            <span className="hidden sm:inline-block font-semibold">
+              Ahmed Hassan
+            </span>
+          </a>
 
-          <motion.button
-            className="lg:hidden w-9 h-9 flex items-center justify-center rounded-full border border-white/10 text-on-surface"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
-            aria-expanded={open}
-            whileTap={{ scale: 0.92 }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {open ? <path d="M6 6l12 12M6 18L18 6" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
-            </svg>
-          </motion.button>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setOpen(false)}
-            />
-            <motion.nav
-              className="lg:hidden relative z-50 mt-3 w-full max-w-sm bg-surface-container/85 backdrop-blur-glass border border-white/10 rounded-3xl px-6 pb-6 pt-4 flex flex-col gap-1 shadow-[0_30px_70px_rgba(0,0,0,0.5)]"
-              initial={{ opacity: 0, y: -16, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -16, scale: 0.97 }}
-              transition={{ duration: 0.3, ease: easeOut }}
-            >
-              {LINKS.map((link, i) => (
-                <motion.a
+          {/* Desktop Nav Links */}
+          <div className="hidden lg:flex items-center gap-1">
+            {NAV_LINKS.map((link) => {
+              const isActive = active === link.href
+              return (
+                <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setOpen(false)}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className={`text-body-md transition-colors py-3 border-b border-white/5 last:border-0 ${
-                    active === link.href ? 'text-primary' : 'text-on-surface-variant hover:text-primary'
+                  onClick={() => handleLinkClick(link.href)}
+                  className={`relative px-3 py-1.5 text-xs font-medium uppercase tracking-[0.12em] rounded-full transition-colors duration-200 ${
+                    isActive
+                      ? 'text-[#062033] font-semibold'
+                      : 'text-on-surface-variant hover:text-on-surface'
                   }`}
                 >
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-pill"
+                      className="absolute inset-0 rounded-full bg-primary -z-10"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
                   {link.label}
-                </motion.a>
-              ))}
-              <motion.a
-                href="#contact"
-                onClick={() => setOpen(false)}
-                className="btn-primary mt-4 justify-center text-sm"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                Hire Me →
-              </motion.a>
-            </motion.nav>
-          </>
+                </a>
+              )
+            })}
+          </div>
+
+          {/* Actions: Command palette, Theme toggle, CV download, Mobile burger */}
+          <div className="flex items-center gap-2">
+            {/* Command Palette Trigger */}
+            <button
+              type="button"
+              onClick={onOpenCommandPalette}
+              title="Command Palette (Ctrl+K / Cmd+K)"
+              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-full border border-white/10 hover:border-primary/40 bg-surface-container/60 text-on-surface-variant hover:text-on-surface transition-colors"
+            >
+              <Terminal className="w-3.5 h-3.5 text-primary" />
+              <span>⌘K</span>
+            </button>
+
+            {/* Theme Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              className="w-9 h-9 rounded-full flex items-center justify-center border border-white/10 hover:border-primary/40 bg-surface-container/60 text-on-surface-variant hover:text-on-surface transition-colors"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-primary" />
+              )}
+            </button>
+
+            {/* CV Download CTA */}
+            <a
+              href={`${import.meta.env.BASE_URL}Ahmed_Hassan_CV.pdf`}
+              download="Ahmed_Hassan_CV.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-medium hover:bg-primary hover:text-[#062033] transition-all"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              <span>CV</span>
+            </a>
+
+            {/* Mobile Hamburger Toggle */}
+            <button
+              type="button"
+              onClick={() => setOpen(!open)}
+              aria-label="Toggle navigation menu"
+              aria-expanded={open}
+              className="lg:hidden w-9 h-9 rounded-full flex items-center justify-center border border-white/10 text-on-surface hover:text-primary transition-colors"
+            >
+              {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="fixed inset-0 z-40 bg-surface/95 backdrop-blur-xl flex flex-col justify-between pt-24 pb-8 px-6 lg:hidden"
+          >
+            <div className="flex flex-col gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant/70 mb-2 px-3">
+                Navigation
+              </span>
+              {NAV_LINKS.map((link) => {
+                const isActive = active === link.href
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => handleLinkClick(link.href)}
+                    className={`px-4 py-3 rounded-xl text-lg font-display font-medium transition-colors flex items-center justify-between ${
+                      isActive
+                        ? 'bg-primary text-[#062033] font-semibold'
+                        : 'text-on-surface hover:bg-surface-container'
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    <span className="text-xs font-mono opacity-70">→</span>
+                  </a>
+                )
+              })}
+            </div>
+
+            <div className="border-t border-white/10 pt-6 flex flex-col gap-4">
+              <div className="flex items-center justify-between gap-3">
+                <a
+                  href={`${import.meta.env.BASE_URL}Ahmed_Hassan_CV.pdf`}
+                  download="Ahmed_Hassan_CV.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary w-full text-center py-2.5 text-sm"
+                >
+                  <FileDown className="w-4 h-4 inline-block mr-1" />
+                  Download CV (PDF)
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false)
+                    onOpenCommandPalette?.()
+                  }}
+                  className="px-3 py-2.5 rounded-full border border-white/10 bg-surface-container text-xs font-mono text-on-surface"
+                >
+                  ⌘K
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center gap-6 pt-2 text-on-surface-variant">
+                <a
+                  href="https://github.com/Ahmed7assan1"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
+                  <GithubIcon className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://linkedin.com/in/Ahmed_Hassan"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
+                  <LinkedinIcon className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://codeforces.com/profile/Abo_7assan"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-mono font-semibold hover:text-primary transition-colors"
+                >
+                  Codeforces
+                </a>
+              </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </>
   )
 }

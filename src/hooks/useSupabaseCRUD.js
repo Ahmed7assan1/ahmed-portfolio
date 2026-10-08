@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient.js'
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient.js'
 
 /**
  * Generic read/write hook for a single Supabase table.
@@ -11,22 +11,34 @@ import { supabase } from '../lib/supabaseClient.js'
  */
 export function useSupabaseCRUD(table, { orderBy = 'order_index', ascending = true } = {}) {
   const [data, setData] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(isSupabaseConfigured)
   const [error, setError] = useState(null)
 
   const refetch = useCallback(async () => {
+    if (!supabase || !isSupabaseConfigured) {
+      setData([])
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     setError(null)
-    let query = supabase.from(table).select('*')
-    if (orderBy) query = query.order(orderBy, { ascending })
-    const { data: rows, error: err } = await query
-    if (err) {
-      setError(err.message)
+    try {
+      let query = supabase.from(table).select('*')
+      if (orderBy) query = query.order(orderBy, { ascending })
+      const { data: rows, error: err } = await query
+      if (err) {
+        setError(err.message)
+        setData([])
+      } else {
+        setData(rows ?? [])
+      }
+    } catch (e) {
+      setError(e?.message || 'Database error')
       setData([])
-    } else {
-      setData(rows ?? [])
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }, [table, orderBy, ascending])
 
   useEffect(() => {
@@ -35,6 +47,7 @@ export function useSupabaseCRUD(table, { orderBy = 'order_index', ascending = tr
 
   const create = useCallback(
     async (values) => {
+      if (!supabase) throw new Error('Supabase client is not configured')
       const { data: row, error: err } = await supabase.from(table).insert(values).select().single()
       if (err) throw new Error(err.message)
       await refetch()
@@ -45,6 +58,7 @@ export function useSupabaseCRUD(table, { orderBy = 'order_index', ascending = tr
 
   const update = useCallback(
     async (id, values) => {
+      if (!supabase) throw new Error('Supabase client is not configured')
       const { data: row, error: err } = await supabase
         .from(table)
         .update(values)
@@ -60,6 +74,7 @@ export function useSupabaseCRUD(table, { orderBy = 'order_index', ascending = tr
 
   const remove = useCallback(
     async (id) => {
+      if (!supabase) throw new Error('Supabase client is not configured')
       const { error: err } = await supabase.from(table).delete().eq('id', id)
       if (err) throw new Error(err.message)
       await refetch()
